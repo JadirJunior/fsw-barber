@@ -16,6 +16,7 @@ import {
 } from "./ui/dialog"
 import { signIn, signOut, useSession } from "next-auth/react"
 import { Avatar, AvatarImage } from "./ui/avatar"
+import React from "react"
 
 const SideBarSheet = () => {
   const { data } = useSession()
