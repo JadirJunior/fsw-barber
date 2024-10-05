@@ -6,15 +6,8 @@ import { SheetClose, SheetContent, SheetHeader, SheetTitle } from "./ui/sheet"
 import Link from "next/link"
 import { quickSearchOptions } from "../_constants/search"
 import Image from "next/image"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "./ui/dialog"
-import { signIn, signOut, useSession } from "next-auth/react"
+import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog"
+import { signOut, useSession } from "next-auth/react"
 import { Avatar, AvatarImage } from "./ui/avatar"
 import React from "react"
 import SignInDialog from "./sign-in-dialog"
@@ -22,7 +15,6 @@ import SignInDialog from "./sign-in-dialog"
 const SideBarSheet = () => {
   const { data } = useSession()
 
-  const handleLoginWithGoogleClick = () => signIn("google")
   const handleLoggoutClick = () => signOut()
 
   return (
@@ -96,16 +88,18 @@ const SideBarSheet = () => {
         ))}
       </div>
 
-      <div className="flex flex-col gap-2 py-5">
-        <Button
-          variant="ghost"
-          className="justify-start gap-2"
-          onClick={handleLoggoutClick}
-        >
-          <LogOutIcon size={18} className="gap-2" />
-          Sair da Conta
-        </Button>
-      </div>
+      {data?.user && (
+        <div className="flex flex-col gap-2 py-5">
+          <Button
+            variant="ghost"
+            className="justify-start gap-2"
+            onClick={handleLoggoutClick}
+          >
+            <LogOutIcon size={18} className="gap-2" />
+            Sair da Conta
+          </Button>
+        </div>
+      )}
     </SheetContent>
   )
 }

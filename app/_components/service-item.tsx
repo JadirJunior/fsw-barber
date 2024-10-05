@@ -119,9 +119,6 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
   }
 
   const handleCreateBooking = async () => {
-    // 1. Não exibir horários que já foram agendados
-    // 2. Não deixar o usuário agendar um horário se não estiver logado
-
     try {
       if (!selectedDate || !selectedTime) return
 
@@ -135,7 +132,6 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
 
       await createBooking({
         serviceId: service.id,
-        userId: (data?.user as any).id,
         date: newDate,
       })
 
