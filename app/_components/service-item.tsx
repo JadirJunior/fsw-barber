@@ -14,7 +14,7 @@ import {
 import { Calendar } from "./ui/calendar"
 import { ptBR } from "date-fns/locale"
 import { useEffect, useMemo, useState } from "react"
-import { addDays, format, isPast, isToday, set } from "date-fns"
+import { isPast, isToday, set } from "date-fns"
 import React from "react"
 import { createBooking } from "../_actions/create-booking"
 import { useSession } from "next-auth/react"
@@ -22,6 +22,7 @@ import { toast } from "sonner"
 import { getBookings } from "../_actions/get-bookings"
 import { Dialog, DialogContent } from "./ui/dialog"
 import SignInDialog from "./sign-in-dialog"
+import BookingSummary from "./booking-summary"
 
 interface ServiceItemProps {
   service: BarbershopService
@@ -117,6 +118,15 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
     fetchBookings()
   }, [selectedDate, service.id])
 
+  const selectedDates = useMemo(() => {
+    if (!selectedDate || !selectedTime) return
+
+    return set(selectedDate, {
+      minutes: Number(selectedTime.split(":")[1]),
+      hours: Number(selectedTime.split(":")[1]),
+    })
+  }, [selectedDate, selectedTime])
+
   const handleBookingClick = () => {
     if (data?.user) {
       return setBookingSheetIsOpen(true)
@@ -142,19 +152,11 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
 
   const handleCreateBooking = async () => {
     try {
-      if (!selectedDate || !selectedTime) return
-
-      const hour = selectedTime?.split(":")[0]
-      const minute = selectedTime?.split(":")[1]
-
-      const newDate = set(selectedDate, {
-        minutes: Number(minute),
-        hours: Number(hour),
-      })
+      if (!selectedDates) return
 
       await createBooking({
         serviceId: service.id,
-        date: newDate,
+        date: selectedDates,
       })
 
       handleBookingSheetOpenChange()
@@ -273,42 +275,15 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
 
                   {selectedTime && selectedDate && (
                     <>
-                      <div className="p-5">
-                        <Card>
-                          <CardContent className="space-y-3 p-3">
-                            <div className="flex items-center justify-between">
-                              <h2 className="font-bold">{service.name}</h2>
-                              <p className="text-sm font-bold">
-                                {Intl.NumberFormat("pt-BR", {
-                                  style: "currency",
-                                  currency: "BRL",
-                                }).format(Number(service.price))}
-                              </p>
-                            </div>
-
-                            <div className="flex items-center justify-between">
-                              <h2 className="text-sm text-gray-400">Data</h2>
-                              <p className="text-sm">
-                                {format(selectedDate, "d 'de' MMMM", {
-                                  locale: ptBR,
-                                })}
-                              </p>
-                            </div>
-
-                            <div className="flex items-center justify-between">
-                              <h2 className="text-sm text-gray-400">Horário</h2>
-                              <p className="text-sm">{selectedTime}</p>
-                            </div>
-
-                            <div className="flex items-center justify-between">
-                              <h2 className="text-sm text-gray-400">
-                                Barbearia
-                              </h2>
-                              <p className="text-sm">{barbershop.name}</p>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </div>
+                      {selectedDates && (
+                        <div className="p-5">
+                          <BookingSummary
+                            barbershop={barbershop}
+                            service={service}
+                            selectedDate={selectedDates}
+                          />
+                        </div>
+                      )}
                       <SheetFooter className="px-5">
                         <Button type="submit" onClick={handleCreateBooking}>
                           Confirmar
