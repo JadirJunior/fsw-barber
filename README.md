@@ -52,4 +52,4 @@ npm run dev
 ## Link do projeto na Vercel
 Caso queira acessá-lo em produção, pode utilizar o seguinte link:
 
-`https://fsw-barber-eight-kohl.vercel.app`
+[https://fsw-barber-eight-kohl.vercel.app](https://fsw-barber-eight-kohl.vercel.app)
