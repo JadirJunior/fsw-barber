@@ -12,6 +12,7 @@ import { authOptions } from "./_lib/auth"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import React from "react"
+import { getConfirmedBookings } from "./_data/get-confirmed-bookings"
 
 export default async function Home() {
   const session = await getServerSession(authOptions)
@@ -22,28 +23,7 @@ export default async function Home() {
     },
   })
 
-  const confirmedBookings = session?.user
-    ? await db.booking.findMany({
-        where: {
-          userId: (session.user as any).id,
-          date: {
-            gte: new Date(),
-          },
-        },
-
-        orderBy: {
-          date: "asc",
-        },
-
-        include: {
-          service: {
-            include: {
-              barbershop: true,
-            },
-          },
-        },
-      })
-    : []
+  const confirmedBookings = await getConfirmedBookings()
 
   return (
     <div>

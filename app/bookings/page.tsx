@@ -5,6 +5,8 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "../_lib/auth"
 import { notFound } from "next/navigation"
 import BookingItem from "../_components/booking-item"
+import { getConfirmedBookings } from "../_data/get-confirmed-bookings"
+import { getFinalizedBookings } from "../_data/get-finalized-bookings"
 
 const Bookings = async () => {
   const session = await getServerSession(authOptions)
@@ -14,33 +16,9 @@ const Bookings = async () => {
     return notFound()
   }
 
-  const confirmedBookings = await db.booking.findMany({
-    where: {
-      userId: (session.user as any).id,
-      date: {
-        gte: new Date(),
-      },
-    },
-    include: {
-      service: {
-        include: { barbershop: true },
-      },
-    },
-  })
+  const confirmedBookings = await getConfirmedBookings()
 
-  const finalizedBookings = await db.booking.findMany({
-    where: {
-      userId: (session.user as any).id,
-      date: {
-        lt: new Date(),
-      },
-    },
-    include: {
-      service: {
-        include: { barbershop: true },
-      },
-    },
-  })
+  const finalizedBookings = await getFinalizedBookings()
 
   return (
     <>
